@@ -53,12 +53,11 @@ const BTN_CSS = [
 const PRIMARY_CSS = 'background:#1f6feb;color:#fff;border:1px solid #1f6feb;'
 const DANGER_CSS = 'background:#cf222e;color:#fff;border:1px solid #cf222e;'
 
-const SIDEBAR_BTN_CSS = [
-  'display:flex;align-items:center;justify-content:center;gap:4px;',
-  'width:100%;padding:6px 12px;margin:0;border:none;background:transparent;',
-  'color:inherit;font:inherit;cursor:pointer;text-align:left;border-radius:6px;',
-  'transition:background .15s;',
-].join('')
+const SIDEBAR_BTN_CSS =
+  'display:flex;align-items:center;gap:6px;width:100%;box-sizing:border-box;' +
+  'margin:4px 0;padding:8px 10px;font-size:13px;cursor:pointer;' +
+  'border:1px solid rgba(127,127,127,.25);background:transparent;color:inherit;' +
+  'border-radius:8px;'
 
 const FLOAT_BTN_CSS = [
   'position:fixed;left:16px;bottom:64px;z-index:2147483645;',
