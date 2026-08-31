@@ -2,6 +2,8 @@
 
 DeepSeek Harness 自定义 Logo 插件 — 上传图片替换侧边栏左上角的品牌图标和文字。
 
+![截图](docs/截图.png)
+
 ## 功能
 
 - **自定义品牌图标** — 上传图片替换 `sidebar.brand.mark` 插槽（鱼形 Logo）
