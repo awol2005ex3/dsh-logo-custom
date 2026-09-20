@@ -8,7 +8,7 @@ DeepSeek Harness 自定义 Logo 插件 — 上传图片替换侧边栏左上角�
 
 - **自定义品牌图标** — 上传图片替换 `sidebar.brand.mark` 插槽（鱼形 Logo）
 - **自定义品牌文字** — 上传图片替换 `sidebar.brand.name` 插槽（品牌名称文字）
-- **拖拽上传** — 支持点击选择或拖拽图片到上传区域
+- **设置页配置** — 上传界面挂在 DSH 自带设置页，不再占用侧边栏按钮
 - **一键恢复** — 随时恢复为默认的 DeepSeek Harness 品牌样式
 - **实时生效** — 上传后立即生效，无需刷新页面
 - **刷新持久化** — 页面刷新后自动恢复自定义 Logo
@@ -40,13 +40,14 @@ npx @deepseek-ai/dsh --profile web restart
 
 ## 使用
 
-1. 启动 DeepSeek Harness 后，在侧边栏底部找到 **🖼️ Logo** 按钮
-2. 点击打开设置面板，面板包含两个上传区域：
+1. 打开 DeepSeek Harness **设置** 页面
+2. 在配置界面中找到 **自定义 Logo**（优先出现在设置分区 / 插件配置卡片中）
+3. 面板包含两个上传区域：
    - **品牌图标 (sidebar.brand.mark)** — 上传 24×24 大小的图标图片
    - **品牌文字 (sidebar.brand.name)** — 上传 160×28 大小的品牌横图
-3. 点击上传区域或拖拽图片文件到该区域
-4. 上传成功后，侧边栏左上角的品牌图标和文字会立即更新
-5. 如需恢复默认，点击 **恢复默认** 按钮
+4. 点击上传区域或拖拽图片文件到该区域
+5. 上传成功后，侧边栏左上角的品牌图标和文字会立即更新
+6. 如需恢复默认，点击 **恢复默认** 按钮
 
 ## 配置
 
@@ -99,7 +100,7 @@ dsh-logo-custom/
 ```css
 [data-slot="sidebar.brand.mark"]   /* 品牌图标容器 */
 [data-slot="sidebar.brand.name"]   /* 品牌名称容器 */
-[data-slot="sidebar.footer.action"] /* 侧边栏底部操作区（挂载按钮） */
+设置页槽位 settings.section / settings.plugin.item（无槽位时回退到设置页 DOM）
 ```
 
 ## 兼容性

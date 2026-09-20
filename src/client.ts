@@ -9,6 +9,7 @@ const WORDMARK_URL = '/dsh-logo-custom/wordmark'
 const WORDMARK_UPLOAD_URL = '/dsh-logo-custom/wordmark-upload'
 
 declare const module: { exports: unknown }
+declare function require(id: string): unknown
 
 const win = window as unknown as { __dshLogoCustomMounted?: boolean }
 const doc = document
@@ -39,10 +40,10 @@ function el<K extends keyof HTMLElementTagNameMap>(
 /* ── Styles ── */
 
 const PANEL_CSS = [
-  'position:fixed;left:16px;bottom:64px;z-index:2147483646;width:380px;max-height:70vh;',
-  'overflow:auto;background:#fff;color:#1f2328;border:1px solid #d0d7de;border-radius:12px;',
-  'box-shadow:0 8px 28px rgba(0,0,0,.18);font:13px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;',
-  'padding:14px;',
+  'position:relative;width:100%;max-width:520px;box-sizing:border-box;',
+  'overflow:auto;background:transparent;color:inherit;border:1px solid rgba(127,127,127,.25);',
+  'border-radius:12px;font:13px/1.5 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;',
+  'padding:14px;margin:8px 0;',
 ].join('')
 
 const BTN_CSS = [
@@ -50,20 +51,7 @@ const BTN_CSS = [
   'border:1px solid #d0d7de;background:#f6f8fa;color:#1f2328;border-radius:6px;',
 ].join('')
 
-const PRIMARY_CSS = 'background:#1f6feb;color:#fff;border:1px solid #1f6feb;'
 const DANGER_CSS = 'background:#cf222e;color:#fff;border:1px solid #cf222e;'
-
-const SIDEBAR_BTN_CSS =
-  'display:flex;align-items:center;gap:6px;width:100%;box-sizing:border-box;' +
-  'margin:4px 0;padding:8px 10px;font-size:13px;cursor:pointer;' +
-  'border:1px solid rgba(127,127,127,.25);background:transparent;color:inherit;' +
-  'border-radius:8px;'
-
-const FLOAT_BTN_CSS = [
-  'position:fixed;left:16px;bottom:64px;z-index:2147483645;',
-  'padding:6px 12px;border:1px solid #d0d7de;background:#f6f8fa;',
-  'color:#1f2328;border-radius:8px;cursor:pointer;font:13px/1.5 sans-serif;',
-].join('')
 
 const LOGO_IMG_CSS = 'max-width:24px;max-height:24px;object-fit:contain;border-radius:2px;display:block;'
 const WORDMARK_IMG_CSS = 'max-width:160px;max-height:28px;object-fit:contain;display:block;'
@@ -72,8 +60,6 @@ const UPLOAD_AREA_CSS = [
   'cursor:pointer;transition:border-color .15s,background .15s;margin:6px 0;',
 ].join('')
 const UPLOAD_AREA_HOVER_CSS = UPLOAD_AREA_CSS + 'border-color:#1f6feb;background:#f6f8fa;'
-
-const SIDEBAR_SLOT = 'sidebar.footer.action'
 
 /* ── Logo replacement logic ── */
 
@@ -176,11 +162,11 @@ function removeCustomLogo(): void {
   if (logoStyleEl) { logoStyleEl.remove(); logoStyleEl = null }
   doc.querySelectorAll('img[data-dsh-logo]').forEach(function (img) { img.remove() })
   doc.querySelectorAll('img[data-dsh-wordmark]').forEach(function (img) { img.remove() })
-  doc.querySelectorAll('[data-dsh-logo-custom="active"]').forEach(function (el) {
-    delete (el as HTMLElement).dataset.dshLogoCustom
+  doc.querySelectorAll('[data-dsh-logo-custom="active"]').forEach(function (node) {
+    delete (node as HTMLElement).dataset.dshLogoCustom
   })
-  doc.querySelectorAll('[data-dsh-wordmark="active"]').forEach(function (el) {
-    delete (el as HTMLElement).dataset.dshWordmark
+  doc.querySelectorAll('[data-dsh-wordmark="active"]').forEach(function (node) {
+    delete (node as HTMLElement).dataset.dshWordmark
   })
 }
 
@@ -345,30 +331,23 @@ function buildPanel(): { root: HTMLElement; refresh: () => Promise<void> } {
   })
   removeBtn.style.display = 'none'
 
-  const closeBtn = el('button', {
-    textContent: '✕',
-    style: 'background:none;border:none;font-size:18px;cursor:pointer;color:#57606a;padding:0 4px;float:right;',
-    onClick: function () { panel.style.display = 'none' },
-  })
-
   const panel = el('div', { style: PANEL_CSS }, [
     el('div', { style: 'font-weight:700;font-size:14px;margin-bottom:6px;' }, [
-      el('span', { textContent: '🎨 自定义Logo' }),
-      closeBtn,
+      el('span', { textContent: '自定义 Logo' }),
     ]),
-    el('div', { style: 'font-size:12px;color:#57606a;margin-bottom:6px;', textContent: '替换侧边栏左上角的品牌图标和文字' }),
+    el('div', { style: 'font-size:12px;opacity:.7;margin-bottom:6px;', textContent: '替换侧边栏左上角的品牌图标和文字' }),
     previewBox,
-    el('div', { style: 'font-weight:600;font-size:12px;color:#1f2328;margin-top:8px;', textContent: '品牌图标 (sidebar.brand.mark)' }),
-    makeUploadArea('image/*', uploadLogo, '📁 点击或拖拽图标图片 (24×24)'),
-    el('div', { style: 'font-weight:600;font-size:12px;color:#1f2328;margin-top:4px;', textContent: '品牌文字 (sidebar.brand.name)' }),
-    makeUploadArea('image/*', uploadWordmark, '📁 点击或拖拽品牌横图 (160×28)'),
+    el('div', { style: 'font-weight:600;font-size:12px;margin-top:8px;', textContent: '品牌图标 (sidebar.brand.mark)' }),
+    makeUploadArea('image/*', uploadLogo, '点击或拖拽图标图片 (24×24)'),
+    el('div', { style: 'font-weight:600;font-size:12px;margin-top:4px;', textContent: '品牌文字 (sidebar.brand.name)' }),
+    makeUploadArea('image/*', uploadWordmark, '点击或拖拽品牌横图 (160×28)'),
     el('div', { style: 'margin-top:8px;' }, [removeBtn]),
     status,
   ])
+  panel.id = 'dsh-logo-custom-panel'
 
   async function refresh(): Promise<void> {
     try {
-      // Use fetch to check both logo and wordmark status
       const [logoRes, wordmarkRes] = await Promise.all([
         fetch(LOGO_URL),
         fetch(WORDMARK_URL),
@@ -377,16 +356,16 @@ function buildPanel(): { root: HTMLElement; refresh: () => Promise<void> } {
       previewBox.innerHTML = ''
       if (logoRes.ok) {
         applyCustomLogo(LOGO_URL)
-        var img = el('img', { src: LOGO_URL + '?rev=' + logoRev, alt: 'Logo', style: 'max-width:120px;max-height:80px;border-radius:4px;border:1px solid #d0d7de;margin:2px;' })
+        const img = el('img', { src: LOGO_URL + '?rev=' + logoRev, alt: 'Logo', style: 'max-width:120px;max-height:80px;border-radius:4px;border:1px solid #d0d7de;margin:2px;' })
         previewBox.append(img)
       }
       if (wordmarkRes.ok) {
         applyWordmark(WORDMARK_URL)
-        var img2 = el('img', { src: WORDMARK_URL + '?rev=' + logoRev, alt: 'Wordmark', style: 'max-width:200px;max-height:40px;border-radius:4px;border:1px solid #d0d7de;margin:2px;' })
+        const img2 = el('img', { src: WORDMARK_URL + '?rev=' + logoRev, alt: 'Wordmark', style: 'max-width:200px;max-height:40px;border-radius:4px;border:1px solid #d0d7de;margin:2px;' })
         previewBox.append(img2)
       }
       if (!logoRes.ok && !wordmarkRes.ok) {
-        previewBox.append(el('div', { style: 'color:#8b949e;font-size:12px;', textContent: '当前使用默认Logo' }))
+        previewBox.append(el('div', { style: 'opacity:.55;font-size:12px;', textContent: '当前使用默认Logo' }))
       }
       removeBtn.style.display = (logoRes.ok || wordmarkRes.ok) ? '' : 'none'
     } catch { status.textContent = '获取状态失败' }
@@ -395,28 +374,120 @@ function buildPanel(): { root: HTMLElement; refresh: () => Promise<void> } {
   return { root: panel, refresh }
 }
 
-/* ── Mount launcher ── */
+function findSettingsHost(): HTMLElement | null {
+  const selectors = [
+    '[data-slot="settings.plugin.item"]',
+    '[data-slot="settings.plugins.tab"]',
+    '[data-slot="settings.section"]',
+    '[data-slot="settings.content"]',
+    '[data-slot="settings.body"]',
+  ]
+  for (const sel of selectors) {
+    const node = doc.querySelector(sel)
+    if (node instanceof HTMLElement) return node
+  }
+  return null
+}
 
-function mountLauncher(launcher: HTMLButtonElement, onMutate?: () => void): void {
-  const styleSidebar = function () { launcher.style.cssText = SIDEBAR_BTN_CSS }
-  const styleFloat = function () { launcher.style.cssText = FLOAT_BTN_CSS }
+function mountPanelInSettings(handle: { root: HTMLElement; refresh: () => Promise<void> }): void {
+  const existing = doc.getElementById('dsh-logo-custom-panel')
+  const host = findSettingsHost()
+  if (!host) {
+    if (existing && existing.parentElement) existing.remove()
+    return
+  }
+  if (handle.root.parentElement !== host) {
+    host.append(handle.root)
+    void handle.refresh()
+  }
+}
 
-  function ensureMounted() {
-    const host = doc.querySelector('[data-slot="' + SIDEBAR_SLOT + '"]')
-    if (host) {
-      if (launcher.parentElement !== host) { host.append(launcher); styleSidebar() }
-    } else if (launcher.parentElement !== doc.body) {
-      doc.body.append(launcher); styleFloat()
+const SECTION_LABEL = '自定义 Logo'
+
+function fillEmptySettingsNav(): void {
+  const dialog = doc.querySelector('[role="dialog"]')
+  if (!dialog) return
+  dialog.querySelectorAll('button, [role="tab"]').forEach(function (btn) {
+    if (!(btn instanceof HTMLElement)) return
+    if (btn.dataset.dshLogoNav === 'true') return
+    if (btn.closest('#dsh-logo-custom-panel')) return
+    if (btn.getAttribute('aria-label')) return
+    const text = (btn.textContent || '').replace(/\s+/g, ' ').trim()
+    if (text) return
+    if (btn.offsetWidth < 72) return
+    btn.dataset.dshLogoNav = 'true'
+    const span = doc.createElement('span')
+    span.textContent = SECTION_LABEL
+    btn.appendChild(span)
+  })
+}
+
+function tryRegisterSettingsSlot(ctx: any, handle: { root: HTMLElement; refresh: () => Promise<void> }): boolean {
+  const register = (slots: any) => {
+    let React: any
+    try { React = require('react') } catch { return false }
+    if (!React || typeof React.createElement !== 'function') return false
+
+    function LogoSettings() {
+      const ref = React.useRef(null)
+      React.useEffect(function () {
+        const node = ref.current as HTMLElement | null
+        if (!node) return
+        node.appendChild(handle.root)
+        void handle.refresh()
+      }, [])
+      return React.createElement('div', { ref, 'data-dsh-logo-settings': 'true' })
     }
+
+    function NavIcon(props: Record<string, unknown>) {
+      return React.createElement(
+        'svg',
+        Object.assign({ width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, 'aria-hidden': true }, props),
+        React.createElement('rect', { x: 3, y: 3, width: 18, height: 18, rx: 2 }),
+        React.createElement('circle', { cx: 8.5, cy: 8.5, r: 1.5 }),
+        React.createElement('path', { d: 'M21 15l-5-5L5 21' }),
+      )
+    }
+
+    const sectionOpts = {
+      id: PLUGIN_ID,
+      label: SECTION_LABEL,
+      title: SECTION_LABEL,
+      icon: NavIcon,
+    }
+
+    const tryOne = (slotName: string, opts: Record<string, unknown>) => {
+      try {
+        if (typeof slots.inject === 'function') {
+          slots.inject(slotName, function () {
+            return slots.register({ name: slotName, ...opts }, LogoSettings)
+          })
+          return true
+        }
+        slots.register({ name: slotName, ...opts }, LogoSettings)
+        return true
+      } catch {
+        return false
+      }
+    }
+
+    if (tryOne('settings.section', sectionOpts)) return true
+    if (tryOne('settings.plugin.item', { key: PLUGIN_ID, label: SECTION_LABEL })) return true
+    if (tryOne('settings.plugins.tab', { id: PLUGIN_ID, label: SECTION_LABEL })) return true
+    return false
   }
 
-  ensureMounted()
-  const observer = new MutationObserver(function () {
-    ensureMounted()
-    syncLogo()
-    if (onMutate) onMutate()
-  })
-  observer.observe(doc.documentElement, { childList: true, subtree: true })
+  try {
+    if (typeof ctx?.inject === 'function') {
+      ctx.inject(['slots'], function (scope: any) {
+        register(scope.slots)
+      })
+      return true
+    }
+    const slots = ctx?.get?.('slots') ?? ctx?.slots
+    if (slots) return register(slots)
+  } catch { /* fall through to DOM mount */ }
+  return false
 }
 
 /* ── Apply ── */
@@ -426,22 +497,15 @@ function apply(ctx: any): void {
   win.__dshLogoCustomMounted = true
 
   const handle = buildPanel()
-  const panel = handle.root
-  panel.style.display = 'none'
-  panel.id = 'dsh-logo-custom-panel'
-  doc.body.append(panel)
+  const slotted = tryRegisterSettingsSlot(ctx, handle)
 
-  const launcher = el('button', { textContent: '🖼️ Logo' })
-  launcher.addEventListener('click', function () {
-    if (panel.style.display === 'none') {
-      panel.style.display = 'block'
-      handle.refresh()
-    } else {
-      panel.style.display = 'none'
-    }
+  const observer = new MutationObserver(function () {
+    syncLogo()
+    fillEmptySettingsNav()
+    if (!slotted) mountPanelInSettings(handle)
   })
-  launcher.id = 'dsh-logo-custom-launcher'
-  mountLauncher(launcher)
+  observer.observe(doc.documentElement, { childList: true, subtree: true })
+  if (!slotted) mountPanelInSettings(handle)
 
   function restoreLogo() {
     fetch(LOGO_URL).then(function (r) {
